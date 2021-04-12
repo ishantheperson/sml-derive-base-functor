@@ -22,6 +22,12 @@ test input =
     Left err -> error $ errorBundlePretty err
     Right v -> v
 
+testType :: String -> SMLType
+testType input = 
+  case runParser (smlType <* eof) "" input of 
+    Left err -> error $ errorBundlePretty err
+    Right v -> v
+
 smlDatatype :: Parser SMLDatatype 
 smlDatatype = do 
   reserved "datatype"
@@ -62,29 +68,30 @@ smlType :: Parser SMLType
 smlType = makeExprParser (term >>= postfixA) operators <?> "type"
   where term =  
               TypeVariable <$> typeVariable 
-          <|> TypeConstructor (TypeTuple []) <$> identifier
+          <|> TypeConstructor [] <$> identifier
           <|> typeVarTuple 
-          <|> parens smlType 
         
         -- A little hacky, but whats happening is that
         -- we need to know if we are parsing a tuple
         -- type or not. In postfixA we aren't necessarily,
         -- but in postfixB we are.
-        postfixA e = tupleType e <|> typeApp e postfixA <|> return e
-        postfixB e = typeApp e postfixB <|> return e
+        postfixA, postfixB :: SMLType -> Parser SMLType
+        postfixA e = tupleType e <|> typeApp [e] postfixA <|> return e
+        postfixB e = typeApp [e] postfixB <|> return e
         tupleType e = do 
           ts <- some (symbol "*" *> (term >>= postfixB))  
           return $ TupleType (e:ts)
 
+        typeApp :: [SMLType] -> (SMLType -> Parser SMLType) -> Parser SMLType
         typeApp e next = identifier >>= \name -> next (TypeConstructor e name)
 
         operators = [[InfixR (Function <$ symbol "->")]]
 
-        typeVarTuple = try $ parens $ do  
-          tvs <- sepBy smlType (symbol ",")
-          return $ case tvs of 
-                    [t] -> t
-                    _ -> TypeTuple tvs 
+        typeVarTuple = do
+          tvs <- parens (sepBy1 smlType (symbol ","))
+          case tvs of 
+            [t] -> return t -- parenthesized type which is not a tuple
+            _ -> typeApp tvs postfixA -- collection of types as part of a type application
         
 typeVariable :: Parser String
 typeVariable = char '\'' *> identifier <?> "type variable"
