@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 34ca2da4dbc5ae5db2e9da63a5dda0fdb146dfeb8c45d94ca6e7f189d5aa0e9d
+-- hash: 5ae627214a372ace357e9304f19a966bdafe5733a53bd00eae4e9cc7f11b0b2e
 
 name:           sml-base-functor
 version:        0.1.0.0
@@ -28,6 +28,9 @@ source-repository head
 library
   exposed-modules:
       Lib
+      SML.SMLDatatype
+      SML.SMLGenerator
+      SML.SMLTypeParser
   other-modules:
       Paths_sml_base_functor
   hs-source-dirs:
@@ -35,6 +38,7 @@ library
   build-depends:
       base >=4.7 && <5
     , megaparsec
+    , parser-combinators
     , recursion-schemes
   default-language: Haskell2010
 
@@ -48,6 +52,7 @@ executable sml-base-functor-exe
   build-depends:
       base >=4.7 && <5
     , megaparsec
+    , parser-combinators
     , recursion-schemes
     , sml-base-functor
   default-language: Haskell2010
@@ -63,6 +68,7 @@ test-suite sml-base-functor-test
   build-depends:
       base >=4.7 && <5
     , megaparsec
+    , parser-combinators
     , recursion-schemes
     , sml-base-functor
   default-language: Haskell2010
