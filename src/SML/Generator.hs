@@ -85,7 +85,7 @@ makeMap SMLDatatype {cases} =
     makeCaseArm :: (String, Maybe SMLType) -> SMLCaseArm
     makeCaseArm (variantName, Nothing) = SMLCaseArm variantName Nothing (Variable variantName)
     makeCaseArm (variantName, Just typ) = 
-      SMLCaseArm variantName (Just "v") $ (Variable variantName) `Application` mapExpr (Variable "v") typ
+      SMLCaseArm variantName (Just "v") $ Variable variantName `Application` mapExpr (Variable "v") typ
 
     mapExpr :: SMLExpression -> SMLType -> SMLExpression 
     mapExpr v (TypeVariable t) | t == recursionVariableName = Application (Variable "f") v

@@ -74,7 +74,7 @@ fun project it =
   case it of
     Nil => NilF | Cons v => (ConsF) (v)
 
-fun project it =
+fun embed it =
   case it of
     NilF => Nil | ConsF v => (Cons) (v)
 

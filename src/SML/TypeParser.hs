@@ -61,6 +61,10 @@ smlDatatype = do
           
           return (name, associatedData)
           
+        -- | typeParams is either:
+        -- - parenthesized list of tyvars
+        -- - just one tyvar
+        -- - not present
         typeParams = 
               parens (sepBy typeVariable (symbol ","))
           <|> pure <$> typeVariable
