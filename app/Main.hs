@@ -15,6 +15,8 @@ main = do
 
     mapFunc = makeMap functor 
 
+  print $ printDataType functor 
+  putStrLn ""
   print $ printFunction projectFunc 
   putStrLn ""
   print $ printFunction embedFunc

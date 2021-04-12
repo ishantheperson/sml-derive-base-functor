@@ -26,7 +26,6 @@ dependencies:
 - recursion-schemes
 - parser-combinators
 - prettyprinter
-- pretty-show
 
 library:
   source-dirs: src

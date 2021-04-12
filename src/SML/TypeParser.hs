@@ -66,8 +66,6 @@ smlDatatype = do
           <|> pure <$> typeVariable
           <|> return []
 
-
--- Really only used when parsing data types
 smlType :: Parser SMLType
 smlType = makeExprParser (term >>= postfixA) operators <?> "type"
   where term =  

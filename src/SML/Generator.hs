@@ -54,7 +54,7 @@ makeProject datatype =
 makeEmbed :: SMLDatatype -> SMLFunction
 makeEmbed SMLDatatype {cases} = 
   let 
-    name = "project"
+    name = "embed"
     params = ["it"]
 
     body = Case (Variable "it") (map projectCase cases)
