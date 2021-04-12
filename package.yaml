@@ -24,6 +24,7 @@ dependencies:
 - megaparsec
 - recursion-schemes
 - parser-combinators
+- pretty-show
 
 library:
   source-dirs: src

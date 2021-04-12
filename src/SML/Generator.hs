@@ -2,15 +2,11 @@
 {-# LANGUAGE NamedFieldPuns #-}
 module SML.Generator where
 
+import Data.Char
+
 import Data.Functor.Foldable
 
 import SML.Syntax
-    ( SMLDatatype(..),
-      SMLType(TypeVariable),
-      SMLTypeF(RecursiveMarkerF),
-      SMLFunction(..),
-      SMLExpression(Variable, Application, Case),
-      SMLCaseArm(..) )
 
 recursionVariableName = "self"
 
@@ -36,7 +32,7 @@ makeProject :: SMLDatatype -> SMLFunction
 makeProject datatype = 
   let 
     name = "project"
-    param = "it"
+    params = ["it"]
 
     body = Case (Variable "it") (map projectCase (cases datatype))
   in 
@@ -56,12 +52,12 @@ makeProject datatype =
       in SMLCaseArm {..}
 
 makeEmbed :: SMLDatatype -> SMLFunction
-makeEmbed datatype = 
+makeEmbed SMLDatatype {cases} = 
   let 
     name = "project"
-    param = "it"
+    params = ["it"]
 
-    body = Case (Variable "it") (map projectCase (cases datatype))
+    body = Case (Variable "it") (map projectCase cases)
   in 
     SMLFunction{..} 
   where 
@@ -75,10 +71,45 @@ makeEmbed datatype =
     projectCase (variantName, Just _) = 
       let 
         boundName = Just "v"
-        body = Application (Variable variantName) (Variable "v")
+        body = Variable variantName `Application` Variable "v"
       in SMLCaseArm (variantName <> "F") boundName body
 
 makeMap :: SMLDatatype -> SMLFunction 
 makeMap SMLDatatype {cases} =
   let 
-  in undefined
+    name = "map"
+    params = ["f", "it"]
+    body = Case (Variable "it") (map makeCaseArm cases)
+  in SMLFunction{..}
+  where 
+    makeCaseArm :: (String, Maybe SMLType) -> SMLCaseArm
+    makeCaseArm (variantName, Nothing) = SMLCaseArm variantName Nothing (Variable variantName)
+    makeCaseArm (variantName, Just typ) = 
+      SMLCaseArm variantName (Just "v") $ mapExpr (Variable "v") typ
+
+    mapExpr :: SMLExpression -> SMLType -> SMLExpression 
+    mapExpr v (TypeVariable t) | t == recursionVariableName = Application (Variable "f") v
+                               | otherwise = v 
+    mapExpr v (TypeConstructor [] _) = v                        
+    mapExpr v (TypeConstructor [paramType] constructor) = 
+      let 
+        moduleName = toUpper (head constructor) : tail constructor
+        func = Variable $ moduleName <> ".map"
+        mapper = SMLFunction {
+            name = "g",
+            params = ["v"],
+            body = mapExpr (Variable "v") paramType
+          }
+      in 
+        LetFunction mapper $ func `Application` Variable "g" `Application` v
+
+    mapExpr v (TypeConstructor _ _) = error "Don't know how to deal with multiple tyvars"
+    mapExpr v (Function _ _) = error "Don't want to deal with function types right now"
+    mapExpr v (TupleType tys) = 
+      let 
+        names = zipWith (\i _ -> "v" <> show i) [1..] tys 
+        es = zipWith mapExpr (Variable <$> names) tys 
+      in 
+        LetTuple names v (MakeTuple es)
+
+    mapExpr _ RecursiveMarker = error "Impossible"

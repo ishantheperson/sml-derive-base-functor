@@ -30,9 +30,16 @@ data SMLExpression =
     Case SMLExpression [SMLCaseArm]
   | Variable String 
   | Application SMLExpression SMLExpression
-  -- | let (v1, v2) = e1 in e2 end
-  | Let [String] SMLExpression SMLExpression
+  -- | let (v1, v2) = e1 in e2 end.
+  -- Also works for single variable bindings
+  | LetTuple [String] SMLExpression SMLExpression
+  -- | let fun f x = .. in e2 end
+  | LetFunction SMLFunction SMLExpression
+  -- | (e1, e2, ..)
+  | MakeTuple [SMLExpression]
   deriving (Show)
+
+infixl `Application`
 
 data SMLFunction = SMLFunction {
     name :: String,
