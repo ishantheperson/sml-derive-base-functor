@@ -62,7 +62,7 @@ printExpr :: SMLExpression -> Doc ann
 printExpr (Case obj arms) = hang 2
   ("case" <+> printExpr obj <+> "of" <> line <> barSeparated (printCaseArm <$> arms))
 printExpr (Variable s) = pretty s 
-printExpr (Application e1 e2) = parens (printExpr e1 <+> printExpr e2)
+printExpr (Application e1 e2) = parens (printExpr e1) <+> parens (printExpr e2)
 printExpr (MakeTuple es) = tupled (printExpr <$> es)
 printExpr (LetTuple vs e1 e2) = align $
   sep [hang 2 ("let" <> line <> ("val" <+> tupled (pretty <$> vs) <+> "=" <+> printExpr e1)),
