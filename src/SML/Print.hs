@@ -53,7 +53,7 @@ printDataType SMLDatatype{..} = group $
 
 
 printCaseArm :: SMLCaseArm -> Doc ann
-printCaseArm SMLCaseArm{..} = hang 2 $
+printCaseArm SMLCaseArm{..} = group $ hang 2 $
   case boundName of 
     Just vname -> pretty variantName <+> pretty vname <+> "=>" <> line <> printExpr body 
     Nothing -> pretty variantName <+> "=>" <> softline <> printExpr body 
