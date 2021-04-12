@@ -1,5 +1,13 @@
 # sml-base-functor
 
+Enables convenient usage of recursion schemes in SML by automatically generating boilerplate.
+
+Once the base functor + map functions have been generated, you can define e.g. the catamorphism function like this:
+
+```sml
+fun cata f = f o map (cata f) o project
+```
+
 ## Example
 
 Input:
