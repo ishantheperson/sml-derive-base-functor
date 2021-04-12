@@ -1,5 +1,9 @@
 {-# LANGUAGE RecordWildCards #-}
-module SML.TypeParser where 
+module SML.TypeParser (
+  test, testType,
+
+  smlDatatype, smlType 
+) where 
 
 import Control.Monad (void)
 
@@ -18,13 +22,13 @@ type Parser = Parsec Void String
 
 test :: String -> SMLDatatype
 test input = 
-  case runParser (smlDatatype <* eof) "" input of 
+  case runParser (sc *> smlDatatype <* eof) "" input of 
     Left err -> error $ errorBundlePretty err
     Right v -> v
 
 testType :: String -> SMLType
 testType input = 
-  case runParser (smlType <* eof) "" input of 
+  case runParser (sc *> smlType <* eof) "" input of 
     Left err -> error $ errorBundlePretty err
     Right v -> v
 

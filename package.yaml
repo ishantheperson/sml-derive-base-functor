@@ -21,10 +21,11 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
-- mtl
+- text
 - megaparsec
 - recursion-schemes
 - parser-combinators
+- prettyprinter
 - pretty-show
 
 library:
@@ -34,10 +35,10 @@ executables:
   sml-base-functor-exe:
     main:                Main.hs
     source-dirs:         app
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
+    # ghc-options:
+    # - -threaded
+    # - -rtsopts
+    # - -with-rtsopts=-N
     dependencies:
     - sml-base-functor
 

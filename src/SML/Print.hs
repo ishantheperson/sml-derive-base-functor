@@ -1,46 +1,26 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DuplicateRecordFields #-}
 module SML.Print where
 
-
-import Data.List 
+import Data.Maybe
+import Data.List ( intercalate ) 
 import Data.Functor.Foldable
-import Control.Monad.State.Strict
-import Control.Monad.State.Class
 
-import Text.Printf 
+import qualified Data.Text as T
+import Text.Printf
+import Prettyprinter
 
 import SML.Syntax 
 
-data SMLPrinterState = SMLPrinterState { indentLevel :: Int, writtenCode :: [String] }
+import SML.TypeParser
+import SML.Generator
 
-initialSMLPrinterState :: SMLPrinterState
-initialSMLPrinterState = SMLPrinterState 0 []
-
-type PrintSML = MonadState SMLPrinterState
-
-runSMLPrinter :: State SMLPrinterState a -> String
-runSMLPrinter = unlines . reverse . writtenCode . flip execState initialSMLPrinterState
-
-indent, unindent :: PrintSML m => m () 
-indent = do 
-  state <- get 
-  put $ state { indentLevel = indentLevel state + 1 }
-
-unindent = do 
-  state <- get 
-  put $ state { indentLevel = indentLevel state - 1 }
-
-outputLine :: PrintSML m => String -> m () 
-outputLine s = do 
-  state <- get 
-  let indentAmount = spacesPerIndent * indentLevel state 
-      line = replicate indentAmount ' ' ++ s 
-  put (state { writtenCode = line : writtenCode state })
-  where 
-    spacesPerIndent :: Int 
-    spacesPerIndent = 4
+a = test "datatype tree = Leaf | Node of tree list * int"
+-- a = test "datatype tree = Leaf | Node of tree list * int | MoreCase of x * y | AnotherCase of a  *b * c * dd * e *f"
+b = baseFunctor a
 
 printType :: SMLType -> String 
 printType = cata go 
@@ -53,19 +33,47 @@ printType = cata go
     go (TupleTypeF ts) = intercalate " * " ts
     go RecursiveMarkerF = error "Recursive marker should not show up"
 
-printDatatype :: SMLDatatype -> String 
-printDatatype SMLDatatype{..} = runSMLPrinter $ do
-  let typevarRep = if null typeVariables then "" else printf "(%s)" (intercalate "," (("'" <>)<$> typeVariables))
-  outputLine $ printf "datatype %s %s =" typevarRep name 
+barSeparated :: [Doc ann] -> Doc ann
+barSeparated = align . encloseSep (flatAlt "  " mempty) mempty (flatAlt "| " " | ")
 
-  let (first:others) = printCase <$> cases 
-
-  indent
-  outputLine $ printf "  %s" first 
-  forM_ others $ \other -> outputLine $ printf "| %s" other
-
+printDataType :: SMLDatatype -> Doc ann
+printDataType SMLDatatype{..} = group $ 
+  let 
+    typevarRep :: String
+    typevarRep = if null typeVariables then "" else printf "(%s)" (intercalate "," (("'" <>)<$> typeVariables))
+  in 
+      hang 2 $ sep [
+        hsep ["datatype", pretty typevarRep, pretty name, "="],
+        barSeparated (pretty . printCase <$> cases)
+      ]
   where 
     printCase :: (String, Maybe SMLType) -> String 
     printCase (variantName, Nothing) = variantName
     printCase (variantName, Just typ) = printf "%s of %s" variantName (printType typ)
+
+
+printCaseArm :: SMLCaseArm -> Doc ann
+printCaseArm SMLCaseArm{..} = hang 2 $
+  case boundName of 
+    Just vname -> pretty variantName <+> pretty vname <+> "=>" <> line <> printExpr body 
+    Nothing -> pretty variantName <+> "=>" <> softline <> printExpr body 
+
+printExpr :: SMLExpression -> Doc ann 
+printExpr (Case obj arms) = hang 2
+  ("case" <+> printExpr obj <+> "of" <> line <> barSeparated (printCaseArm <$> arms))
+printExpr (Variable s) = pretty s 
+printExpr (Application e1 e2) = parens (printExpr e1 <+> printExpr e2)
+printExpr (MakeTuple es) = tupled (printExpr <$> es)
+printExpr (LetTuple vs e1 e2) = align $
+  sep [hang 2 ("let" <> line <> ("val" <+> tupled (pretty <$> vs) <+> "=" <+> printExpr e1)),
+       hang 2 ("in" <> line <> printExpr e2),
+       "end"]
+printExpr (LetFunction func e) = align $
+  sep [hang 2 ("let" <> line <> printFunction func),
+       hang 2 ("in" <> line <> printExpr e),
+       "end"]
+
+printFunction :: SMLFunction -> Doc ann
+printFunction SMLFunction{..} = hang 2 $
+  "fun" <+> pretty name <+> hsep (pretty <$> params) <+> "=" <> line <> printExpr body
 
