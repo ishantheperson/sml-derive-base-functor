@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5ae627214a372ace357e9304f19a966bdafe5733a53bd00eae4e9cc7f11b0b2e
+-- hash: 4f715ed6e013df180fc9841b92b8235e970de44f9320e61f1c62c178cd14c382
 
 name:           sml-base-functor
 version:        0.1.0.0
@@ -28,9 +28,9 @@ source-repository head
 library
   exposed-modules:
       Lib
-      SML.SMLDatatype
-      SML.SMLGenerator
-      SML.SMLTypeParser
+      SML.Generator
+      SML.Syntax
+      SML.TypeParser
   other-modules:
       Paths_sml_base_functor
   hs-source-dirs:

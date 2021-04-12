@@ -1,7 +1,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DeriveTraversable #-}
-module SML.SMLDatatype where 
+{-# LANGUAGE DuplicateRecordFields #-}
+module SML.Syntax where 
 
 import Data.Functor.Foldable.TH
 
@@ -18,6 +19,26 @@ data SMLDatatype = SMLDatatype {
     name :: String,
     typeVariables :: [String],
     cases :: [(String, Maybe SMLType)]
+  } deriving (Show)
+
+data SMLCaseArm = SMLCaseArm { 
+    variantName :: String, 
+    boundName :: Maybe String, 
+    body :: SMLExpression 
+  } deriving (Show)
+
+data SMLExpression = 
+    Case SMLExpression [SMLCaseArm]
+  | Variable String 
+  | Application SMLExpression SMLExpression
+  -- | let (v1, v2) = e1 in e2 end
+  | Let [String] SMLExpression SMLExpression
+  deriving (Show)
+
+data SMLFunction = SMLFunction {
+    name :: String,
+    param :: String,
+    body :: SMLExpression
   } deriving (Show)
 
 makeBaseFunctor ''SMLType 

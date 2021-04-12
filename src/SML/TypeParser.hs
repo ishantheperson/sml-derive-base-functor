@@ -1,5 +1,5 @@
 {-# LANGUAGE RecordWildCards #-}
-module SML.SMLTypeParser where 
+module SML.TypeParser where 
 
 import Control.Monad (void)
 
@@ -12,9 +12,15 @@ import qualified Text.Megaparsec.Char.Lexer as Lex
 import Control.Monad.Combinators.Expr
 import Data.Void 
 
-import SML.SMLDatatype 
+import SML.Syntax 
 
 type Parser = Parsec Void String 
+
+test :: String -> SMLDatatype
+test input = 
+  case runParser (smlDatatype <* eof) "" input of 
+    Left err -> error $ errorBundlePretty err
+    Right v -> v
 
 smlDatatype :: Parser SMLDatatype 
 smlDatatype = do 
@@ -30,7 +36,7 @@ smlDatatype = do
   -- change X too.
   -- This could be fixed by making sure that the argument to the type constructor
   -- is the same type tuple but that gets annoying and shouldn't really
-  -- be a problem
+  -- be a problem.
   let replacedRecursive (TypeConstructorF _ typeName) | typeName == name = RecursiveMarker
       replacedRecursive other = embed other
 
