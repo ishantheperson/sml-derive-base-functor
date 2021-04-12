@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 20d88c8d48c9b65ed283fc279cc73d35bd6d1948349202ab12a68f71b10246bc
+-- hash: abf8956585445ed7f40bb547d3f6f5d31276122248ab735afda0e08cd0b55763
 
 name:           sml-base-functor
 version:        0.1.0.0
@@ -29,6 +29,7 @@ library
   exposed-modules:
       Lib
       SML.Generator
+      SML.Print
       SML.Syntax
       SML.TypeParser
   other-modules:
@@ -38,6 +39,7 @@ library
   build-depends:
       base >=4.7 && <5
     , megaparsec
+    , mtl
     , parser-combinators
     , pretty-show
     , recursion-schemes
@@ -53,6 +55,7 @@ executable sml-base-functor-exe
   build-depends:
       base >=4.7 && <5
     , megaparsec
+    , mtl
     , parser-combinators
     , pretty-show
     , recursion-schemes
@@ -70,6 +73,7 @@ test-suite sml-base-functor-test
   build-depends:
       base >=4.7 && <5
     , megaparsec
+    , mtl
     , parser-combinators
     , pretty-show
     , recursion-schemes
