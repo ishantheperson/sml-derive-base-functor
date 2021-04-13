@@ -6,7 +6,7 @@ import SML.Print
 
 main :: IO ()
 main = do 
-  input <- test <$> getContents
+  input <- parseDatatype <$> getContents
 
   let 
     functor = baseFunctor input 

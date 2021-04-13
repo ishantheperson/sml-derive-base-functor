@@ -1,12 +1,10 @@
-{-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 module SML.Print where
 
 import Data.Maybe
-import Data.List ( intercalate ) 
+import Data.List (intercalate) 
 import Data.Functor.Foldable
 
 import qualified Data.Text as T
@@ -14,13 +12,6 @@ import Text.Printf
 import Prettyprinter
 
 import SML.Syntax 
-
-import SML.TypeParser
-import SML.Generator
-
-a = test "datatype tree = Leaf | Node of tree list * int"
--- a = test "datatype tree = Leaf | Node of tree list * int | MoreCase of x * y | AnotherCase of a  *b * c * dd * e *f"
-b = baseFunctor a
 
 printType :: SMLType -> String 
 printType = cata go 
@@ -76,4 +67,3 @@ printExpr (LetFunction func e) = align $
 printFunction :: SMLFunction -> Doc ann
 printFunction SMLFunction{..} = hang 2 $
   "fun" <+> pretty name <+> hsep (pretty <$> params) <+> "=" <> line <> printExpr body
-

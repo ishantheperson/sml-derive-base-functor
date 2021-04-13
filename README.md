@@ -60,7 +60,7 @@ fun map f it =
     | recursivemarkerF => recursivemarkerF
 ```
 
-## Caveats
+## Notes
  - For nested functor types, the program tries to infer which `map` function to use by doing `(capitalized type name).map` i.e. looking inside the module "capital type". For example for `list` it uses `List.map`. Some types don't use this format necesssarily (e.g. `Marked.t` would produce the wrong result). The lookup mechanism will be extended later
 
  - This should work if the input datatype is polymorphic:
@@ -83,5 +83,6 @@ fun map f it =
       NilF => NilF
     | ConsF v => (ConsF) (let val (v1, v2) = v in (v1, (f) (v2)) end)
  ```
-
+  - This is basically purely syntactical manipulation so it won't
+    see through type aliases or mutually recursive types, etc.
   - Lots of extra parenthesis since I didn't want to bother dealing with precedence. Might fix that later

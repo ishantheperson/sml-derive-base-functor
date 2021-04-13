@@ -1,8 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 module SML.TypeParser (
-  test, testType,
-
-  smlDatatype, smlType 
+  parseDatatype, parseType
 ) where 
 
 import Control.Monad (void)
@@ -20,14 +18,14 @@ import SML.Syntax
 
 type Parser = Parsec Void String 
 
-test :: String -> SMLDatatype
-test input = 
+parseDatatype :: String -> SMLDatatype
+parseDatatype input = 
   case runParser (sc *> smlDatatype <* eof) "" input of 
     Left err -> error $ errorBundlePretty err
     Right v -> v
 
-testType :: String -> SMLType
-testType input = 
+parseType :: String -> SMLType
+parseType input = 
   case runParser (sc *> smlType <* eof) "" input of 
     Left err -> error $ errorBundlePretty err
     Right v -> v
