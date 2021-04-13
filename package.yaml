@@ -31,7 +31,7 @@ library:
   source-dirs: src
 
 executables:
-  sml-base-functor-exe:
+  sml-base-functor:
     main:                Main.hs
     source-dirs:         app
     # ghc-options:

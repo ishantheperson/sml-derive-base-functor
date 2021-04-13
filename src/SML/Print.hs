@@ -31,17 +31,18 @@ printDataType :: SMLDatatype -> Doc ann
 printDataType SMLDatatype{..} = group $ 
   let 
     typevarRep :: String
-    typevarRep = if null typeVariables then "" else printf "(%s)" (intercalate "," (("'" <>)<$> typeVariables))
+    typevarRep = if null typeVariables 
+                   then "" 
+                   else printf "(%s)" (intercalate "," (("'" <>)<$> typeVariables))
   in 
-      hang 2 $ sep [
-        hsep ["datatype", pretty typevarRep, pretty name, "="],
-        barSeparated (pretty . printCase <$> cases)
-      ]
+    hang 2 $ sep [
+      hsep ["datatype", pretty typevarRep, pretty name, "="],
+      barSeparated (pretty . printCase <$> cases)
+    ]
   where 
     printCase :: (String, Maybe SMLType) -> String 
     printCase (variantName, Nothing) = variantName
     printCase (variantName, Just typ) = printf "%s of %s" variantName (printType typ)
-
 
 printCaseArm :: SMLCaseArm -> Doc ann
 printCaseArm SMLCaseArm{..} = group $ hang 2 $

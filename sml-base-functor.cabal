@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5a9691101378dc84438606f5990e2a029d42a5f2a49763ceb92b63f1c29e64d5
+-- hash: a6af0f15ba0b9aff0a6062a99bd9297ad319f5fc3342900ae52de4d9f395a092
 
 name:           sml-base-functor
 version:        0.1.0.0
@@ -44,7 +44,7 @@ library
     , text
   default-language: Haskell2010
 
-executable sml-base-functor-exe
+executable sml-base-functor
   main-is: Main.hs
   other-modules:
       Paths_sml_base_functor

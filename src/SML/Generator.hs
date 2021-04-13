@@ -17,7 +17,6 @@ baseFunctor SMLDatatype{..} =
     functorName = name <> "F"
     functorTypeParams = recursionVariableName : typeVariables 
     functorDataCases = map baseFunctorify cases
-
   in 
     SMLDatatype functorName functorTypeParams functorDataCases
   where 
