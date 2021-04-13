@@ -5,8 +5,9 @@ Enables convenient usage of recursion schemes in SML by automatically generating
 Once the base functor + map functions have been generated, you can define e.g. the catamorphism function like this:
 
 ```sml
-fun cata f = f o map (cata f) o project
+fun cata f t = f (map (cata f) (project t))
 ```
+Note that this function can't be written point-free since that would cause evaluation of the partial application `cata f` to loop. 
 
 ## Example
 
